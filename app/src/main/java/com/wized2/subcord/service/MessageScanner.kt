@@ -37,11 +37,12 @@ class MessageScanner(private val maxSeen: Int = 80) {
 
     private fun looksLikeMessage(s: String): Boolean {
         if (s.length > 800) return false
-        if (s.matches(Regex("^\d{1,2}:\d{2}(\s?[AP]M)?$"))) return false
+        if (s.matches(Regex("""^\d{1,2}:\d{2}(\s?[AP]M)?$"""))) return false
         if (s.equals("Discord", true)) return false
         if (s.startsWith("http://") || s.startsWith("https://")) return false
         return s.count { it.isLetter() } >= 3
     }
 
-    private fun fingerprint(s: String) = s.lowercase().replace(Regex("\s+"), " ").take(240)
+    private fun fingerprint(s: String) = s.lowercase().replace(Regex("""\s+"""), " ").take(240)
 }
+
