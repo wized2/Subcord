@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="seed">#5865F2</color>
+    <color name="seed_container">#DDE1FF</color>
+    <color name="bg">#0F111A</color>
+    <color name="surface">#1A1D2B</color>
+    <color name="on_surface">#E8EAF2</color>
+    <color name="muted">#9AA0B4</color>
+    <color name="overlay_bg">#E61A1D2B</color>
+    <color name="bubble">#5865F2</color>
+</resources>

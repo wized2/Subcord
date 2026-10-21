@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Subcord</string>
+    <string name="accessibility_service_label">Subcord Discord Reader</string>
+    <string name="accessibility_service_description">Reads visible Discord chat text so Subcord can translate new messages into English in a floating overlay. No Discord login or token is used.</string>
+    <string name="notification_channel">Subcord overlay</string>
+    <string name="notification_title">Subcord is active</string>
+    <string name="notification_text">Tap to open settings. Overlay follows Discord chat.</string>
+    <string name="perm_accessibility">1. Enable accessibility</string>
+    <string name="perm_overlay">2. Allow display over other apps</string>
+    <string name="start_overlay">Start overlay</string>
+    <string name="stop_overlay">Stop overlay</string>
+    <string name="status_ready">Ready — open Discord and scroll the chat</string>
+    <string name="status_need_a11y">Accessibility service is off</string>
+    <string name="status_need_overlay">Overlay permission is off</string>
+    <string name="status_running">Overlay running</string>
+    <string name="tagline">Live English subtitles for Discord — on your screen, no account access.</string>
+    <string name="privacy_note">Screen reading stays on-device. Translations use ML Kit models on the phone. No Discord token. No self-bot.</string>
+    <string name="settings_bubble">Show floating toggle bubble</string>
+    <string name="settings_skip_english">Skip text already in English</string>
+    <string name="open_discord">Open Discord</string>
+</resources>

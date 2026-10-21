@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:fillViewport="true" android:background="@color/bg">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="24dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/app_name" android:textColor="@color/on_surface"
+            android:textSize="32sp" android:textStyle="bold"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="@string/tagline"
+            android:textColor="@color/muted" android:textSize="15sp"/>
+        <TextView android:id="@+id/statusText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="20dp"
+            android:background="@color/surface" android:padding="14dp"
+            android:textColor="@color/on_surface" android:textSize="14sp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnAccessibility"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:text="@string/perm_accessibility"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnOverlay"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="@string/perm_overlay"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnToggleService"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:text="@string/start_overlay"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnOpenDiscord"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="@string/open_discord"/>
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/switchBubble"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" android:text="@string/settings_bubble"
+            android:textColor="@color/on_surface"/>
+        <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/switchSkipEnglish"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" android:text="@string/settings_skip_english"
+            android:textColor="@color/on_surface"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" android:text="@string/privacy_note"
+            android:textColor="@color/muted" android:textSize="13sp"/>
+    </LinearLayout>
+</ScrollView>

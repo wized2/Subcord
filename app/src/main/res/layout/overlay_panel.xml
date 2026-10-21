@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:id="@+id/panel" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_margin="12dp"
+        android:background="@drawable/bg_overlay_panel" android:orientation="vertical" android:padding="12dp">
+        <TextView android:id="@+id/overlayTitle" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:text="Subcord"
+            android:textColor="@color/muted" android:textSize="11sp"/>
+        <TextView android:id="@+id/overlayText" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="4dp"
+            android:textColor="@color/on_surface" android:textSize="14sp"/>
+    </LinearLayout>
+</FrameLayout>
