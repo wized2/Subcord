@@ -1,7 +1,6 @@
 package com.wized2.subcord
 
 import android.content.Context
-import com.google.mlkit.nl.translate.TranslateLanguage
 
 class Prefs(context: Context) {
     private val sp = context.getSharedPreferences("subcord", Context.MODE_PRIVATE)
@@ -18,12 +17,11 @@ class Prefs(context: Context) {
         get() = sp.getBoolean("skip_english", true)
         set(v) = sp.edit().putBoolean("skip_english", v).apply()
 
-    /** BCP-47 / ML Kit target language tag. Default English. */
+    /** Target language tag (ISO 639-1). Default English. */
     var targetLang: String
-        get() = sp.getString("target_lang", TranslateLanguage.ENGLISH) ?: TranslateLanguage.ENGLISH
+        get() = sp.getString("target_lang", "en") ?: "en"
         set(v) = sp.edit().putString("target_lang", v).apply()
 
-    /** How long the translation panel stays visible (ms). */
     var panelDurationMs: Int
         get() = sp.getInt("panel_duration_ms", 6500).coerceIn(2000, 30000)
         set(v) = sp.edit().putInt("panel_duration_ms", v.coerceIn(2000, 30000)).apply()

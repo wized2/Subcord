@@ -1,3 +1,5 @@
--keep class com.google.mlkit.** { *; }
--dontwarn com.google.mlkit.**
--keep class com.google.android.gms.internal.mlkit_** { *; }
+# Keep JSON access used by TranslationEngine
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-dontwarn org.json.**

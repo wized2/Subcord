@@ -15,7 +15,7 @@ No Discord login. No bot token. No root. No self-bot.
 
 - Auto-translate newly seen messages in servers, DMs, and group chats (whatever is on screen)
 - Floating bubble to pause / resume translations
-- On-device language ID + translation (models download once per language pair)
+- Network translation with in-memory cache (no bulky on-device models in the APK)
 - In-memory translation cache
 - Filters Discord UI chrome (timestamps, buttons, nav labels)
 - Works with `com.discord`, Canary, and PTB
@@ -29,7 +29,7 @@ No Discord login. No bot token. No root. No self-bot.
 ## Privacy
 
 - Screen reading runs locally
-- Translation uses ML Kit models on the device
+- Only message text is sent to the translation service; screen reading stays local
 - Subcord does not access your Discord account or token
 
 ## Setup
@@ -39,7 +39,7 @@ No Discord login. No bot token. No root. No self-bot.
 3. Allow **Display over other apps**
 4. Tap **Start overlay**, open Discord, scroll the chat
 
-First translation for a new language may download an ML Kit model (network once).
+Translation requires a network connection. English-looking lines can be skipped in settings.
 
 ## Build
 
