@@ -7,7 +7,7 @@
 
   var PROCESSED = new WeakSet();
   var PENDING = Object.create(null);
-  var STYLE_ID = "subcord-style-v1";
+  var STYLE_ID = "subcord-style-v2";
   var ATTR_ID = "data-subcord-id";
   var seq = 1;
 
@@ -17,9 +17,9 @@
     s.id = STYLE_ID;
     s.textContent = [
       ".subcord-tr{display:block;margin-top:4px;padding:6px 8px;border-radius:8px;",
-      "background:rgba(88,101,242,.14);border-left:3px solid #5865F2;",
-      "color:var(--text-normal,#dbdee1);font-size:.92em;line-height:1.35;",
-      "white-space:pre-wrap;word-break:break-word;}",
+      "background:rgba(88,101,242,.16);border-left:3px solid #5865F2;",
+      "color:var(--text-normal,#dbdee1);font-size:.9em;line-height:1.35;",
+      "white-space:pre-wrap;word-break:break-word;max-width:100%;}",
       ".subcord-tr b{opacity:.55;font-weight:600;margin-right:6px;font-size:.85em;}"
     ].join("");
     (document.head || document.documentElement).appendChild(s);
@@ -29,8 +29,7 @@
     if (!t || t.length < 2) return true;
     var letters = t.replace(/[^A-Za-z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/g, "");
     if (letters.length < 2) return true;
-    var nonLatin = (letters.match(/[^\u0000-\u024F]/g) || []).length;
-    if (nonLatin > 0) return false;
+    if (/[^\u0000-\u024F]/.test(letters)) return false;
     var latin = (letters.match(/[A-Za-z]/g) || []).length;
     return latin / letters.length >= 0.85;
   }
@@ -44,20 +43,18 @@
 
   function messageNodes(root) {
     root = root || document;
-    var list = [];
     var sels = [
       'div[class*="messageContent"]',
       'div[id^="message-content-"]',
-      'div[class*="markup"]'
+      'div[class*="markup"]',
+      'div[class*="messageContent-"]',
+      '[data-list-item-id^="chat-messages"] div[class*="markup"]'
     ];
+    var list = [];
     for (var i = 0; i < sels.length; i++) {
-      try {
-        root.querySelectorAll(sels[i]).forEach(function (n) { list.push(n); });
-      } catch (e) {}
+      try { root.querySelectorAll(sels[i]).forEach(function (n) { list.push(n); }); } catch (e) {}
     }
-    return Array.prototype.filter.call(list, function (n, idx) {
-      return list.indexOf(n) === idx;
-    });
+    return list.filter(function (n, idx) { return list.indexOf(n) === idx; });
   }
 
   function ensureSlot(el) {
@@ -81,17 +78,12 @@
       return;
     }
     if (!window.SubcordBridge || typeof window.SubcordBridge.translate !== "function") return;
-
     var id = "sc" + (seq++);
     el.setAttribute(ATTR_ID, id);
     PROCESSED.add(el);
     PENDING[id] = el;
-    try {
-      window.SubcordBridge.translate(id, t);
-    } catch (e) {
-      delete PENDING[id];
-      PROCESSED.delete(el);
-    }
+    try { window.SubcordBridge.translate(id, t); }
+    catch (e) { delete PENDING[id]; PROCESSED.delete(el); }
   }
 
   window.__subcordOnResult = function (id, translated) {
@@ -101,14 +93,11 @@
       if (!el || !translated) return;
       ensureStyle();
       var slot = ensureSlot(el);
-      slot.innerHTML = "<b>EN</b>" + escapeHtml(String(translated));
+      slot.innerHTML = "<b>EN</b>" + String(translated)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       slot.style.display = "block";
     } catch (e) {}
   };
-
-  function escapeHtml(s) {
-    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  }
 
   function scan(root) {
     ensureStyle();
@@ -123,8 +112,8 @@
     obs = new MutationObserver(function (mutations) {
       for (var i = 0; i < mutations.length; i++) {
         var m = mutations[i];
-        if (m.type === "childList") {
-          m.addedNodes && m.addedNodes.forEach(function (n) {
+        if (m.type === "childList" && m.addedNodes) {
+          m.addedNodes.forEach(function (n) {
             if (n.nodeType !== 1) return;
             if (n.classList && n.classList.contains("subcord-tr")) return;
             scan(n);
@@ -148,17 +137,17 @@
       if (!obs) startObserver();
       scan(document);
     } catch (e) {}
-  }, 2500);
+  }, 3000);
 
   try {
     var push = history.pushState;
     history.pushState = function () {
       var r = push.apply(this, arguments);
-      setTimeout(function () { scan(document); }, 400);
+      setTimeout(function () { scan(document); }, 350);
       return r;
     };
     window.addEventListener("popstate", function () {
-      setTimeout(function () { scan(document); }, 400);
+      setTimeout(function () { scan(document); }, 350);
     });
   } catch (e) {}
 })();

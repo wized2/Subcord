@@ -1,13 +1,14 @@
-## Subcord 1.2.0 — Discord Web + HTML injection
+## Subcord 1.3.0 — mobile Discord + last channel memory
 
-### Primary mode
-- Opens **Discord Web** inside the app (login works; cookies stay on device)
-- Injects a resilient translator script into the page
-- Native bridge translates text (Google + MyMemory fallback) and writes **EN** under messages
-- Survives SPA navigation with MutationObserver + periodic re-scan + re-inject
+### Fixed
+- **Mobile UI** — uses Android Chrome user-agent so Discord shows the phone chat layout (not desktop sidebar)
+- Viewport forced to `device-width`
 
-### Legacy
-- Accessibility overlay for the native Discord app remains in Settings
+### Removed
+- Legacy Accessibility overlay / floating bubble / related permissions
 
-### Size
-Still ~1.6–2MB release (no ML Kit natives).
+### New
+- **Remembers last channel/DM URL** (`discord.com/channels/...`) and restores it on next open
+- Settings: skip-English, show last URL, reset to Home
+
+Still ~1.6MB release.

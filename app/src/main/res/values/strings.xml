@@ -1,33 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Subcord</string>
-    <string name="accessibility_service_label">Subcord Discord Reader</string>
-    <string name="accessibility_service_description">Reads visible Discord chat text so Subcord can translate new messages into English in a floating overlay. Text is sent to a translation service; no Discord login or token is used.</string>
-    <string name="notification_channel">Subcord overlay</string>
-    <string name="notification_title">Subcord is active</string>
-    <string name="notification_text">Tap to open settings. Overlay follows Discord chat.</string>
-    <string name="perm_accessibility">1. Enable accessibility</string>
-    <string name="perm_overlay">2. Allow display over other apps</string>
-    <string name="start_overlay">Start overlay</string>
-    <string name="stop_overlay">Stop overlay</string>
-    <string name="status_ready">Ready — open Discord and scroll the chat</string>
-    <string name="status_need_a11y">Accessibility service is off</string>
-    <string name="status_need_overlay">Overlay permission is off</string>
-    <string name="status_running">Overlay running</string>
-    <string name="tagline">Live English subtitles for Discord — on your screen, no account access.</string>
-    <string name="privacy_note">Screen reading stays on-device. Translation text is sent to a translation service (network). No Discord token. No self-bot.</string>
-    <string name="settings_bubble">Show floating toggle bubble</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_blurb">Discord runs in mobile web mode inside Subcord. Translations appear under messages. Your last channel is restored next time you open the app.</string>
     <string name="settings_skip_english">Skip text already in English</string>
-    <string name="open_discord">Open Discord</string>
-
-    <string name="settings_title">Subcord settings</string>
-    <string name="web_loading">Loading Discord…</string>
-    <string name="web_ready">Discord ready</string>
-    <string name="web_injected">Translator attached</string>
+    <string name="settings_last_url">Last location:\n%s</string>
+    <string name="back_to_discord">Back to Discord</string>
+    <string name="reset_home">Reset to Home (DMs)</string>
+    <string name="privacy_note">Login cookies stay on this device. Only message text is sent to the translation service. No Discord token is extracted.</string>
+    <string name="web_loading">Loading…</string>
+    <string name="web_ready">Ready</string>
+    <string name="web_injected">Translator on</string>
     <string name="web_reinject">Re-inject translator</string>
     <string name="web_reload">Reload</string>
     <string name="web_settings">Settings</string>
-    <string name="open_web_discord">Open Discord Web (recommended)</string>
-    <string name="mode_web_note">Primary mode: Discord Web inside Subcord with HTML translation. Login cookies stay on device. Legacy overlay for the native Discord app is optional below.</string>
 </resources>
-
