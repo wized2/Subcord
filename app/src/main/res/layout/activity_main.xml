@@ -14,7 +14,14 @@
             android:layout_height="wrap_content" android:layout_marginTop="20dp"
             android:background="@color/surface" android:padding="14dp"
             android:textColor="@color/on_surface" android:textSize="14sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/mode_web_note" android:textColor="@color/muted" android:textSize="13sp"
+            android:layout_marginBottom="12dp"/>
+        <com.google.android.material.button.MaterialButton android:id="@+id/btnOpenWeb"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/open_web_discord"/>
         <com.google.android.material.button.MaterialButton android:id="@+id/btnAccessibility"
+
             style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:text="@string/perm_accessibility"/>

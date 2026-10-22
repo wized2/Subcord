@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.wized2.subcord.service.OverlayService
+import com.wized2.subcord.web.DiscordWebActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var prefs: Prefs
@@ -23,6 +24,10 @@ class MainActivity : AppCompatActivity() {
         statusText = findViewById(R.id.statusText)
         btnToggle = findViewById(R.id.btnToggleService)
 
+        findViewById<MaterialButton>(R.id.btnOpenWeb)?.setOnClickListener {
+            startActivity(Intent(this, DiscordWebActivity::class.java))
+            finish()
+        }
         findViewById<MaterialButton>(R.id.btnAccessibility).setOnClickListener {
             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
         }

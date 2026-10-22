@@ -1,11 +1,13 @@
-## Subcord 1.1.1 — translation reliability
+## Subcord 1.2.0 — Discord Web + HTML injection
 
-### Fixes
-- **Debounced scanning** instead of cancelling every accessibility event (this was dropping translations mid-request)
-- **Rescan** when overlay starts so already-visible messages are translated
-- **MyMemory fallback** if Google Translate endpoint is blocked
-- Better Arabic / RTL message detection and overlay text
-- Faster accessibility notification timeout
+### Primary mode
+- Opens **Discord Web** inside the app (login works; cookies stay on device)
+- Injects a resilient translator script into the page
+- Native bridge translates text (Google + MyMemory fallback) and writes **EN** under messages
+- Survives SPA navigation with MutationObserver + periodic re-scan + re-inject
+
+### Legacy
+- Accessibility overlay for the native Discord app remains in Settings
 
 ### Size
-Still ~1.6MB release (no ML Kit natives).
+Still ~1.6–2MB release (no ML Kit natives).

@@ -2,7 +2,7 @@
 
 **Live English subtitles for Discord — on your Android screen.**
 
-Subcord is a floating overlay translator for the Discord Android app. It reads **visible** chat text with an AccessibilityService, detects new non-English lines, translates them on-device with [ML Kit](https://developers.google.com/ml-kit/language/translation), and shows the result in a system overlay.
+Subcord primarily runs **Discord Web** in-app and injects a translator into the HTML chat. A legacy Accessibility overlay for the native Discord app is still available in Settings. It reads **visible** chat text with an AccessibilityService, detects new non-English lines, translates them on-device with [ML Kit](https://developers.google.com/ml-kit/language/translation), and shows the result in a system overlay.
 
 No Discord login. No bot token. No root. No self-bot.
 
