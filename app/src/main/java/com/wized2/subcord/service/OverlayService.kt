@@ -119,7 +119,7 @@ class OverlayService : Service() {
             hideRunnable?.let { handler.removeCallbacks(it) }
             val hide = Runnable { view.visibility = View.GONE }
             hideRunnable = hide
-            handler.postDelayed(hide, 6500)
+            handler.postDelayed(hide, Prefs(this).panelDurationMs.toLong())
         }
     }
 
