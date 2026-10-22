@@ -112,7 +112,11 @@ class OverlayService : Service() {
                 panelView = it
                 windowManager.addView(it, layoutParams(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, 80))
             }
-            view.findViewById<TextView>(R.id.overlayText).text = translated
+            val tv = view.findViewById<TextView>(R.id.overlayText)
+            tv.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+            tv.text = if (!original.isNullOrBlank() && original != translated) {
+                "→ $translated"
+            } else translated
             view.findViewById<TextView>(R.id.overlayTitle).text =
                 if (original.isNullOrBlank()) "Subcord" else original.take(80)
             view.visibility = View.VISIBLE
@@ -146,6 +150,10 @@ class OverlayService : Service() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(i)
             else context.startService(i)
             Prefs(context).overlayEnabled = true
+            // Let accessibility service re-read currently visible messages
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                DiscordTranslateService.requestRescan()
+            }, 600)
         }
         fun stop(context: Context) {
             context.startService(Intent(context, OverlayService::class.java).setAction(ACTION_STOP))
