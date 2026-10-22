@@ -62,7 +62,7 @@ class TranslationEngine(
                     block == Character.UnicodeBlock.THAI
             }
             if (nonLatin > 0) return false
-            return latin.toFloat() / letters.size >= 0.85f
+            return latin.toFloat() / letters.length >= 0.85f
         }
 
         private fun translateHttp(text: String, target: String): String? {
