@@ -10,7 +10,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 /**
- * Network translator with multiple backends (no native ML Kit libs).
+ * Network translator with cleaned input and Arabic-aware source language.
  */
 class TranslationEngine(
     private val targetLang: String = "en",
@@ -21,7 +21,7 @@ class TranslationEngine(
 
     suspend fun translateIfNeeded(text: String, skipIfEnglish: Boolean): String? =
         withContext(Dispatchers.IO) {
-            val trimmed = text.trim()
+            val trimmed = cleanInput(text)
             if (trimmed.length < 2) return@withContext null
             synchronized(cache) { cache[trimmed]?.let { return@withContext it } }
 
@@ -29,13 +29,17 @@ class TranslationEngine(
                 return@withContext null
             }
 
-            val translated = translateGtx(trimmed, targetLang)
-                ?: translateMyMemory(trimmed, targetLang)
+            val src = detectSourceLang(trimmed)
+            val translated = translateGtx(trimmed, src, targetLang)
+                ?: translateMyMemory(trimmed, src, targetLang)
                 ?: return@withContext null
 
-            if (translated.equals(trimmed, ignoreCase = true)) return@withContext null
-            synchronized(cache) { cache[trimmed] = translated }
-            translated
+            val cleanedOut = cleanOutput(translated)
+            if (cleanedOut.isEmpty() || cleanedOut.equals(trimmed, ignoreCase = true)) {
+                return@withContext null
+            }
+            synchronized(cache) { cache[trimmed] = cleanedOut }
+            cleanedOut
         }
 
     fun close() {
@@ -43,18 +47,53 @@ class TranslationEngine(
     }
 
     companion object {
+        private val ARABIC = Regex("[\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF]")
+        private val EDITED = Regex("""\s*\(edited\)\s*""", RegexOption.IGNORE_CASE)
+        private val DATE_LINE = Regex(
+            """\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\s+[A-Za-z]+\s+\d{1,2},?\s+\d{4}\s+at\s+\d{1,2}:\d{2}\s*(?:AM|PM)?""",
+            RegexOption.IGNORE_CASE,
+        )
+        private val TIME_ONLY = Regex("""\b\d{1,2}:\d{2}\s*(?:AM|PM)\b""", RegexOption.IGNORE_CASE)
+
+        fun cleanInput(raw: String): String {
+            var t = raw.trim().replace(Regex("""\s+"""), " ")
+            t = EDITED.replace(t, " ")
+            t = DATE_LINE.replace(t, " ")
+            t = TIME_ONLY.replace(t, " ")
+            t = t.replace(Regex("""\bNEW\b"""), " ")
+            return t.replace(Regex("""\s+"""), " ").trim()
+        }
+
+        fun cleanOutput(raw: String): String {
+            var t = raw.trim()
+            t = EDITED.replace(t, " ")
+            t = DATE_LINE.replace(t, " ")
+            // Drop trailing garbage after a leftover weekday
+            t = t.replace(
+                Regex(
+                    """\s+(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b.*$""",
+                    RegexOption.IGNORE_CASE,
+                ),
+                "",
+            )
+            return t.replace(Regex("""\s+"""), " ").trim()
+        }
+
+        fun detectSourceLang(s: String): String {
+            if (ARABIC.containsMatchIn(s)) return "ar"
+            return "auto"
+        }
+
         fun looksPrimarilyEnglish(s: String): Boolean {
             val letters = s.filter { it.isLetter() }
             if (letters.length < 3) return false
+            if (ARABIC.containsMatchIn(letters)) return false
             val nonLatin = letters.count { ch ->
                 val block = Character.UnicodeBlock.of(ch)
                 block == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS ||
                     block == Character.UnicodeBlock.HIRAGANA ||
                     block == Character.UnicodeBlock.KATAKANA ||
                     block == Character.UnicodeBlock.HANGUL_SYLLABLES ||
-                    block == Character.UnicodeBlock.ARABIC ||
-                    block == Character.UnicodeBlock.ARABIC_SUPPLEMENT ||
-                    block == Character.UnicodeBlock.ARABIC_EXTENDED_A ||
                     block == Character.UnicodeBlock.CYRILLIC ||
                     block == Character.UnicodeBlock.DEVANAGARI ||
                     block == Character.UnicodeBlock.THAI
@@ -69,7 +108,7 @@ class TranslationEngine(
                 connectTimeout = timeoutMs
                 readTimeout = timeoutMs
                 requestMethod = "GET"
-                setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 13) Subcord/1.1.1")
+                setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 13) Subcord/1.3.1")
                 setRequestProperty("Accept", "*/*")
             }
             return try {
@@ -82,11 +121,12 @@ class TranslationEngine(
             }
         }
 
-        private fun translateGtx(text: String, target: String): String? {
+        private fun translateGtx(text: String, src: String, target: String): String? {
             val q = URLEncoder.encode(text.take(900), StandardCharsets.UTF_8.name())
+            val sl = if (src == "auto") "auto" else src
             val body = httpGet(
                 "https://translate.googleapis.com/translate_a/single" +
-                    "?client=gtx&sl=auto&tl=$target&dt=t&q=$q",
+                    "?client=gtx&sl=$sl&tl=$target&dt=t&q=$q",
             ) ?: return null
             return parseGtx(body)
         }
@@ -106,11 +146,11 @@ class TranslationEngine(
             }
         }
 
-        /** Fallback when GTX is blocked/rate-limited. */
-        private fun translateMyMemory(text: String, target: String): String? {
+        private fun translateMyMemory(text: String, src: String, target: String): String? {
             val q = URLEncoder.encode(text.take(500), StandardCharsets.UTF_8.name())
+            val pair = if (src == "auto") "autodetect|$target" else "$src|$target"
             val body = httpGet(
-                "https://api.mymemory.translated.net/get?q=$q&langpair=autodetect|$target",
+                "https://api.mymemory.translated.net/get?q=$q&langpair=$pair",
             ) ?: return null
             return try {
                 val obj = JSONObject(body)

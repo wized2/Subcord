@@ -11,8 +11,8 @@ android {
         applicationId = "com.wized2.subcord"
         minSdk = 26
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.3.0"
+        versionCode = 7
+        versionName = "1.3.1"
         // Phone ABIs only — drops x86 emulator natives (~35MB)
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a")

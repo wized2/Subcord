@@ -1,14 +1,11 @@
-## Subcord 1.3.0 — mobile Discord + last channel memory
+## Subcord 1.3.1 — readable translations + cleaner Arabic input
 
-### Fixed
-- **Mobile UI** — uses Android Chrome user-agent so Discord shows the phone chat layout (not desktop sidebar)
-- Viewport forced to `device-width`
+### Visibility
+- Translation cards use **high-contrast** colors for light and dark Discord themes (no more washed-out text)
 
-### Removed
-- Legacy Accessibility overlay / floating bubble / related permissions
+### Quality
+- Strip `(edited)`, timestamps, and date lines before translating
+- Detect Arabic and request `sl=ar` (better than pure auto for dialect noise)
+- Prefer innermost message node only (less username / reply junk)
 
-### New
-- **Remembers last channel/DM URL** (`discord.com/channels/...`) and restores it on next open
-- Settings: skip-English, show last URL, reset to Home
-
-Still ~1.6MB release.
+Machine translation of informal dialect Arabic will still be imperfect — free APIs are not human quality — but results should be clearer and less garbage-filled.

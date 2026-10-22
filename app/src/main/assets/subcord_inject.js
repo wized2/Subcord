@@ -7,38 +7,100 @@
 
   var PROCESSED = new WeakSet();
   var PENDING = Object.create(null);
-  var STYLE_ID = "subcord-style-v2";
+  var STYLE_ID = "subcord-style-v3";
   var ATTR_ID = "data-subcord-id";
   var seq = 1;
 
+  function isDarkTheme() {
+    try {
+      var bg = getComputedStyle(document.body || document.documentElement)
+        .getPropertyValue("--background-primary")
+        .trim();
+      if (bg && bg.indexOf("rgb") === 0) {
+        var m = bg.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+        if (m) {
+          var r = +m[1], g = +m[2], b = +m[3];
+          // luminance
+          return (0.2126 * r + 0.7152 * g + 0.0722 * b) < 140;
+        }
+      }
+      // fallback: Discord html class / data
+      var cl = (document.documentElement.className || "") + " " + (document.body && document.body.className || "");
+      if (/theme-dark|darkTheme|dark/i.test(cl)) return true;
+      if (/theme-light|lightTheme|light/i.test(cl)) return false;
+    } catch (e) {}
+    return true;
+  }
+
   function ensureStyle() {
-    if (document.getElementById(STYLE_ID)) return;
-    var s = document.createElement("style");
-    s.id = STYLE_ID;
-    s.textContent = [
-      ".subcord-tr{display:block;margin-top:4px;padding:6px 8px;border-radius:8px;",
-      "background:rgba(88,101,242,.16);border-left:3px solid #5865F2;",
-      "color:var(--text-normal,#dbdee1);font-size:.9em;line-height:1.35;",
-      "white-space:pre-wrap;word-break:break-word;max-width:100%;}",
-      ".subcord-tr b{opacity:.55;font-weight:600;margin-right:6px;font-size:.85em;}"
-    ].join("");
-    (document.head || document.documentElement).appendChild(s);
+    var dark = isDarkTheme();
+    var css = dark
+      ? [
+          ".subcord-tr{display:block;margin-top:5px;padding:7px 10px;border-radius:8px;",
+          "background:#1e2230;border:1px solid #5865F2;border-left-width:4px;",
+          "color:#f2f3f5 !important;font-size:14px;line-height:1.4;",
+          "white-space:pre-wrap;word-break:break-word;max-width:100%;opacity:1 !important;}",
+          ".subcord-tr b{color:#8ea1fc !important;opacity:1 !important;font-weight:700;",
+          "margin-right:6px;font-size:12px;letter-spacing:.02em;}"
+        ].join("")
+      : [
+          ".subcord-tr{display:block;margin-top:5px;padding:7px 10px;border-radius:8px;",
+          "background:#eef0ff;border:1px solid #5865F2;border-left-width:4px;",
+          "color:#1e1f22 !important;font-size:14px;line-height:1.4;",
+          "white-space:pre-wrap;word-break:break-word;max-width:100%;opacity:1 !important;}",
+          ".subcord-tr b{color:#3c45a5 !important;opacity:1 !important;font-weight:700;",
+          "margin-right:6px;font-size:12px;letter-spacing:.02em;}"
+        ].join("");
+
+    var s = document.getElementById(STYLE_ID);
+    if (!s) {
+      s = document.createElement("style");
+      s.id = STYLE_ID;
+      (document.head || document.documentElement).appendChild(s);
+    }
+    if (s.getAttribute("data-theme") !== (dark ? "dark" : "light")) {
+      s.setAttribute("data-theme", dark ? "dark" : "light");
+      s.textContent = css;
+    }
   }
 
   function looksEnglish(t) {
     if (!t || t.length < 2) return true;
     var letters = t.replace(/[^A-Za-z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u3040-\u30FF\u4E00-\u9FFF\uAC00-\uD7AF]/g, "");
     if (letters.length < 2) return true;
+    if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(letters)) return false;
     if (/[^\u0000-\u024F]/.test(letters)) return false;
     var latin = (letters.match(/[A-Za-z]/g) || []).length;
     return latin / letters.length >= 0.85;
   }
 
+  /** Strip Discord chrome that pollutes translation. */
+  function cleanText(t) {
+    if (!t) return "";
+    t = t.replace(/\s+/g, " ").trim();
+    // (edited) and localized variants
+    t = t.replace(/^\(edited\)\s*/i, "");
+    t = t.replace(/\s*\(edited\)\s*/gi, " ");
+    // Full date lines Discord sometimes exposes: Thursday, October 22, 2026 at 2:58 PM
+    t = t.replace(
+      /\b(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\s+[A-Za-z]+\s+\d{1,2},?\s+\d{4}\s+at\s+\d{1,2}:\d{2}\s*(?:AM|PM)?/gi,
+      " "
+    );
+    // Standalone times
+    t = t.replace(/\b\d{1,2}:\d{2}\s*(?:AM|PM)\b/gi, " ");
+    // NEW badge text
+    t = t.replace(/\bNEW\b/g, " ");
+    // Collapse whitespace again
+    return t.replace(/\s+/g, " ").trim();
+  }
+
   function textOf(el) {
     if (!el) return "";
     var clone = el.cloneNode(true);
-    clone.querySelectorAll(".subcord-tr, script, style").forEach(function (n) { n.remove(); });
-    return (clone.innerText || clone.textContent || "").replace(/\s+/g, " ").trim();
+    clone.querySelectorAll(
+      ".subcord-tr, script, style, time, [class*='timestamp'], [class*='Timestamp'], [class*='edited'], [class*='Edited']"
+    ).forEach(function (n) { n.remove(); });
+    return cleanText(clone.innerText || clone.textContent || "");
   }
 
   function messageNodes(root) {
@@ -54,7 +116,15 @@
     for (var i = 0; i < sels.length; i++) {
       try { root.querySelectorAll(sels[i]).forEach(function (n) { list.push(n); }); } catch (e) {}
     }
-    return list.filter(function (n, idx) { return list.indexOf(n) === idx; });
+    // Prefer innermost messageContent over outer markup when both match
+    return list.filter(function (n, idx) {
+      if (list.indexOf(n) !== idx) return false;
+      // skip if nested inside another matched message node
+      for (var j = 0; j < list.length; j++) {
+        if (list[j] !== n && list[j].contains(n)) return false;
+      }
+      return true;
+    });
   }
 
   function ensureSlot(el) {
@@ -72,7 +142,7 @@
     if (!el || PROCESSED.has(el)) return;
     if (el.closest && el.closest(".subcord-tr")) return;
     var t = textOf(el);
-    if (t.length < 2 || t.length > 1200) return;
+    if (t.length < 2 || t.length > 900) return;
     if (window.__SUBCORD_SKIP_EN__ !== false && looksEnglish(t)) {
       PROCESSED.add(el);
       return;
@@ -93,8 +163,14 @@
       if (!el || !translated) return;
       ensureStyle();
       var slot = ensureSlot(el);
-      slot.innerHTML = "<b>EN</b>" + String(translated)
+      var safe = String(translated)
         .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      // Drop accidental date tails from bad MT input
+      safe = safe.replace(
+        /\s*(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\s+[A-Za-z]+\s+\d{1,2}.*/i,
+        ""
+      ).trim();
+      slot.innerHTML = "<b>EN</b>" + safe;
       slot.style.display = "block";
     } catch (e) {}
   };
@@ -133,7 +209,7 @@
   window.__subcordBoot();
   setInterval(function () {
     try {
-      if (!document.getElementById(STYLE_ID)) ensureStyle();
+      ensureStyle(); // theme may switch
       if (!obs) startObserver();
       scan(document);
     } catch (e) {}
